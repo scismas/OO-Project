@@ -17,21 +17,9 @@ public class GenomicsMain { //Uhh right now this is just for testing I guess, ru
 		String fileLoc = "SP1.fq";
 		FASTQParser fqp = new FASTQParser(fileLoc);
 		fqp.parseFile();
+		window.importStrandArr(fqp.getStrandArray());
 		
-		System.out.println(fqp.getID(249));
-		System.out.println(fqp.getData(249));
-		
-		String testPattern = "TGGG";
-		
-		DNAStrand testDNA = new DNAStrand("TestPattern", testPattern);
-		DNAStrand compDNA = testDNA.compStrand();
-		
-		System.out.println(fqp.patternSearch(testPattern, 249));
-		System.out.println(fqp.patternSearch(testDNA, 249));
-		
-		System.out.println(testDNA.getData());
-		System.out.println(compDNA.getData());
-		window.drawStrand(fqp.getStrand(1));
+		window.drawStrand(0);
 	}
 	
 	public static void startGUI() {

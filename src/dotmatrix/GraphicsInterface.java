@@ -8,13 +8,17 @@ import java.awt.Graphics2D;
 import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.util.Random;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -22,6 +26,10 @@ import javax.swing.JTextField;
 import javax.swing.border.Border;
 
 public class GraphicsInterface {
+	private DNAStrand[] strandArr;
+	private int curStrand = 0;
+	private int totalStrands = 0;
+	
 	private JFrame window;
 	
 	private JPanel drawingSheet;
@@ -32,6 +40,15 @@ public class GraphicsInterface {
 	Graphics2D bufferedImageGraphics;
 	
 	private GridLayout curLayout;
+	
+	private JLabel strandNum;
+	private JLabel curStrandNum;
+	private JFormattedTextField curField;
+	private JTextField idField;
+	private JButton displayButton;
+	private JButton plusButton;
+	private JButton minusButton;
+	private JButton randButton;
 	
 	private final Color colA = new Color(237, 97, 97);
 	private final Color colT = new Color(255, 243, 117);
@@ -106,40 +123,102 @@ public class GraphicsInterface {
 		buttonPanel = new JPanel();
 		buttonPanel.setLayout(null);
 		
-		JButton button;
 		JLabel label;
-		JTextField textField;
-		
+		//LABELS
 		label = new JLabel("DNA Strand ID:");
 		label.setFont(new Font("Times New Roman", Font.BOLD, 38));
-		label.setBounds(30,  0, 300, 100);
+		label.setBounds(30, 0, 300, 100);
 		buttonPanel.add(label);
 		
-		textField = new JTextField(30);
-		textField.setFont(new Font("Times New Roman", Font.PLAIN, 30));
-		textField.setBounds(320, 25, 450, 50);
-		buttonPanel.add(textField);
+		strandNum = new JLabel("Total Strands: " + totalStrands);
+		strandNum.setFont(new Font("Times New Roman", Font.PLAIN, 30));
+		strandNum.setBounds(30, 50, 300, 100);
+		buttonPanel.add(strandNum);
 		
-		button = new JButton("Display");
-		button.setFont(new Font("Times New Roman", Font.PLAIN, 30));
-		button.setBounds(780, 25, 140, 50);
-		buttonPanel.add(button);
+		curStrandNum = new JLabel("Current Strand: ");
+		curStrandNum.setFont(new Font("Times New Roman", Font.PLAIN, 30));
+		curStrandNum.setBounds(270, 50, 300, 100);
+		buttonPanel.add(curStrandNum);
 		
-		button = new JButton("-");
-		button.setFont(new Font("Times New Roman", Font.PLAIN, 30));
-		button.setBounds(870, 90, 50, 50);
-		buttonPanel.add(button);
+		//TEXTFIELDS
+		idField = new JTextField(30);
+		idField.setFont(new Font("Times New Roman", Font.PLAIN, 30));
+		idField.setBounds(320, 25, 450, 50);
+		buttonPanel.add(idField);
 		
-		button = new JButton("+");
-		button.setFont(new Font("Times New Roman", Font.BOLD, 28));
-		button.setBounds(810, 90, 50, 50);
-		buttonPanel.add(button);
+		curField = new JFormattedTextField();
+		curField.setColumns(3);
+		curField.setFont(new Font("Times New Roman", Font.PLAIN, 30));
+		curField.setBounds(470, 80, 60, 40);
+		buttonPanel.add(curField);
 		
-		button = new JButton("?");
-		button.setFont(new Font("Times New Roman", Font.BOLD, 30));
-		button.setBounds(750, 90, 50, 50);
-		buttonPanel.add(button);
-
+		//BUTTONS
+		displayButton = new JButton("Display");
+		displayButton.setFont(new Font("Times New Roman", Font.PLAIN, 30));
+		displayButton.setBounds(780, 25, 140, 50);
+		displayButton.addActionListener(new ActionListener()
+		{
+			  public void actionPerformed(ActionEvent e)
+			  {
+			    System.out.println("Display");
+			    String tempText = curField.getText();
+			    int tempInt = Integer.parseInt(tempText);
+			    if (tempInt > 0 && tempInt < strandArr.length) {
+			    	drawStrand(tempInt);
+			    }
+			  }
+			});
+		buttonPanel.add(displayButton);
+		
+		minusButton = new JButton("-");
+		minusButton.setFont(new Font("Times New Roman", Font.PLAIN, 30));
+		minusButton.setBounds(870, 90, 50, 50);
+		minusButton.addActionListener(new ActionListener()
+		{
+			  public void actionPerformed(ActionEvent e)
+			  {
+			    if (curStrand != 0) {
+			    	drawStrand(--curStrand);
+			    	System.out.println("Previous Strand");
+			    }
+			  }
+			});
+		buttonPanel.add(minusButton);
+		
+		plusButton = new JButton("+");
+		plusButton.setFont(new Font("Times New Roman", Font.BOLD, 28));
+		plusButton.setBounds(810, 90, 50, 50);
+		plusButton.addActionListener(new ActionListener()
+		{
+			  public void actionPerformed(ActionEvent e)
+			  {
+				if (curStrand != strandArr.length - 1) {
+					 System.out.println("Next Strand");
+					 drawStrand(++curStrand);
+				}
+			  }
+			});
+		buttonPanel.add(plusButton);
+		
+		randButton = new JButton("?");
+		randButton.setFont(new Font("Times New Roman", Font.BOLD, 30));
+		randButton.setBounds(750, 90, 50, 50);
+		randButton.addActionListener(new ActionListener()
+		{
+			  public void actionPerformed(ActionEvent e)
+			  {
+				Random rand = new Random();
+			    System.out.println("Random Strand");
+			    curStrand = rand.nextInt(strandArr.length);
+			    drawStrand(curStrand);
+			  }
+			});
+		buttonPanel.add(randButton);
+	}
+	
+	public void updateUI() {
+		strandNum.setText("Total Strands: " + totalStrands);
+		curField.setText(Integer.toString(curStrand));
 	}
 	
 	public void addMouseEventHandler() {	//To test coordinates and dynamic drawing
@@ -151,10 +230,16 @@ public class GraphicsInterface {
 	    });
 	}
 	
+	public void drawStrand(int i) { //Draws strand from the strand array inside this class
+		drawStrand(strandArr[i]);
+		curStrand = i;
+	}
+	
 	public void drawStrand(DNAStrand strand) { //Draws entire strand, both sides
 		int baseX = 350;
 		int baseY = 30;
 		DNAStrand temp = strand.compStrand();
+		idField.setText(strand.getID());
 		for (int i = 0; i < strand.getLength(); ++i) {
 			Rectangle2D line = new Rectangle2D.Float(baseX + 120, baseY + 20 + 60 * i, 10, 5);
 			bufferedImageGraphics.fill(line);
@@ -162,6 +247,7 @@ public class GraphicsInterface {
 			drawBase(baseX, baseY + 60 * i, strand.getData().charAt(i));
 			drawBase(baseX + 130, baseY + 60 * i, temp.getData().charAt(i));
 		}
+		updateUI();
 	}
 	
 	public void drawBase(int x, int y, char base) { //Draws a single base with correct color
@@ -193,5 +279,10 @@ public class GraphicsInterface {
 		String temp = "" + base;
 		bufferedImageGraphics.drawString(temp, x + 48, y + 34);
 		window.repaint();
+	}
+	
+	public void importStrandArr(DNAStrand[] strandArr) {
+		this.strandArr = strandArr;
+		this.totalStrands = strandArr.length;
 	}
 }

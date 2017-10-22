@@ -46,6 +46,10 @@ public class FASTQParser {
 		return parsedDNA[i].patternSearch(dna);
 	}
 	
+	public DNAStrand[] getStrandArray() {
+		return parsedDNA;
+	}
+	
 	public DNAStrand getStrand(int i) {
 		return parsedDNA[i];
 	}
