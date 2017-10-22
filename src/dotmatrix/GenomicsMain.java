@@ -8,8 +8,12 @@ package dotmatrix;
 
 import java.io.IOException;
 
-public class GenomicsMain {
+public class GenomicsMain { //Uhh right now this is just for testing I guess, runs the window and stuff but like doesn't do much yet
+	static GraphicsInterface window;
 	public static void main(String[] args) throws IOException {
+		startGUI();
+		
+		//Creating file path for file that needs to be parsed
 		String fileLoc = "SP1.fq";
 		FASTQParser fqp = new FASTQParser(fileLoc);
 		fqp.parseFile();
@@ -27,5 +31,10 @@ public class GenomicsMain {
 		
 		System.out.println(testDNA.getData());
 		System.out.println(compDNA.getData());
+		window.drawStrand(fqp.getStrand(1));
+	}
+	
+	public static void startGUI() {
+		window = new GraphicsInterface();
 	}
 }

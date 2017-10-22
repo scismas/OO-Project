@@ -13,7 +13,7 @@ public class FASTQParser {
 	private BufferedReader rawData;
 	private int total;
 	
-	public FASTQParser(String fileLoc) throws IOException {
+	public FASTQParser(String fileLoc) throws IOException { //FASTQParser holds both raw and processed data
 		this.filePath = Paths.get(fileLoc);
 		
 		Charset charset = Charset.forName("US-ASCII");
@@ -28,7 +28,7 @@ public class FASTQParser {
 		rawData.reset(); //reset to beginning for parsing later
 	}
 	
-	public void parseFile() throws IOException {
+	public void parseFile() throws IOException {	//Parsed data into DNAStrand array
 		rawData.mark(100000000); //Unsure if this is efficient, couldn't do it another way
 		for (int i = 0; i < this.total; ++i) {
 			parsedDNA[i] = new DNAStrand(rawData.readLine(), rawData.readLine());
@@ -38,15 +38,19 @@ public class FASTQParser {
 		rawData.reset();
 	}
 	
-	public int patternSearch(String pattern, int i) {
+	public int patternSearch(String pattern, int i) {	//Returns index of pattern, if not found returns -1
 		return parsedDNA[i].patternSearch(pattern);
 	}
 	
-	public int patternSearch(DNAStrand dna, int i) {
+	public int patternSearch(DNAStrand dna, int i) {	//Samesies^
 		return parsedDNA[i].patternSearch(dna);
 	}
 	
-	public String getID(int i) {
+	public DNAStrand getStrand(int i) {
+		return parsedDNA[i];
+	}
+	
+	public String getID(int i) {	//Should be obvi, same with the next two methods
 		return parsedDNA[i].getID();
 	}
 	

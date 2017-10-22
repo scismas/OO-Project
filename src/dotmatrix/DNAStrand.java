@@ -1,6 +1,6 @@
 package dotmatrix;
 
-public class DNAStrand {
+public class DNAStrand {	//Stores all relevant info about a single DNA strand (does not yet support qualifiers)
 	private String id;
 	private String data;
 	private int length;
@@ -9,13 +9,19 @@ public class DNAStrand {
 		this("", "");
 	}
 	
+	public DNAStrand(DNAStrand original) {
+		this.id = original.getID() + "Copy";
+		this.data = original.getData();
+		this.length = data.length();
+	}
+	
 	public DNAStrand(String id, String data) {
 		this.id = id;
 		this.data = data;
 		this.length = data.length();
 	}
 	
-	public DNAStrand compStrand() {
+	public DNAStrand compStrand() {	//Creates DNAStrand with complementary values, A<->T and C<->G
 		String newID = this.getID() + "Complementary";
 		String newData = "";
 		for (int i = 0; i < this.getLength(); ++i) {
@@ -25,7 +31,7 @@ public class DNAStrand {
 		return newStrand;
 	}
 	
-	public int patternSearch(String pattern) {
+	public int patternSearch(String pattern) { //Returns index of where string is found, if not found returns -1
 		return data.indexOf(pattern);
 	}
 	
@@ -33,7 +39,7 @@ public class DNAStrand {
 		return data.indexOf(dna.getData());
 	}
 	
-	public static char compPair(char base) { //This seems like a hack, but I guess it works and is technically O(4)?
+	public static char compPair(char base) { //This seems like a hack and there must be some cleaner way to do this, but I guess it works and is technically O(4)?
 		if (base == 'G') {
 			return 'C';
 		}
@@ -51,7 +57,7 @@ public class DNAStrand {
 		}
 	}
 	
-	public String getID() {
+	public String getID() {	//Ugh only reason to do this is because all the instances are private. Same with the next two methods
 		return id;
 	}
 	public String getData() {
