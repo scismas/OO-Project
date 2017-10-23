@@ -31,6 +31,14 @@ public class DNAStrand {	//Stores all relevant info about a single DNA strand (d
 		return newStrand;
 	}
 	
+	public String compString(String baseString) {
+		String newString = "";
+		for (int i = 0; i < baseString.length(); ++i) {
+			newString += compPair(baseString.charAt(i));
+		}
+		return newString;
+	}
+	
 	public int patternSearch(String pattern) { //Returns index of where string is found, if not found returns -1
 		return data.indexOf(pattern);
 	}

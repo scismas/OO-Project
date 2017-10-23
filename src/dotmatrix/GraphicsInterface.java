@@ -10,6 +10,8 @@ import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Rectangle2D;
@@ -22,13 +24,17 @@ import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JSeparator;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 
 public class GraphicsInterface {
 	private DNAStrand[] strandArr;
 	private int curStrand = 0;
 	private int totalStrands = 0;
+	private int indexFound = -1;
+	private String sideFound = " @ NaN";
 	
 	private JFrame window;
 	
@@ -43,12 +49,18 @@ public class GraphicsInterface {
 	
 	private JLabel strandNum;
 	private JLabel curStrandNum;
+	private JLabel rawDataStr;
+	private JLabel searchIndex;
+	
 	private JFormattedTextField curField;
 	private JTextField idField;
+	private JTextField searchField;
+	
 	private JButton displayButton;
 	private JButton plusButton;
 	private JButton minusButton;
 	private JButton randButton;
+	private JButton searchButton;
 	
 	private final Color colA = new Color(237, 97, 97);
 	private final Color colT = new Color(255, 243, 117);
@@ -130,6 +142,21 @@ public class GraphicsInterface {
 		label.setBounds(30, 0, 300, 100);
 		buttonPanel.add(label);
 		
+		label = new JLabel("Raw Data of Main Strand:");
+		label.setFont(new Font("Times New Roman", Font.PLAIN, 30));
+		label.setBounds(30, 180, 400, 30);
+		buttonPanel.add(label);
+		
+		label = new JLabel("Sequence to Find:");
+		label.setFont(new Font("Times New Roman", Font.PLAIN, 30));
+		label.setBounds(30, 300, 400, 30);
+		buttonPanel.add(label);
+		
+		rawDataStr = new JLabel("-----------------------------------");
+		rawDataStr.setFont(new Font("Courier New", Font.BOLD, 30));
+		rawDataStr.setBounds(30, 230, 1000, 30);
+		buttonPanel.add(rawDataStr);
+		
 		strandNum = new JLabel("Total Strands: " + totalStrands);
 		strandNum.setFont(new Font("Times New Roman", Font.PLAIN, 30));
 		strandNum.setBounds(30, 50, 300, 100);
@@ -140,10 +167,26 @@ public class GraphicsInterface {
 		curStrandNum.setBounds(270, 50, 300, 100);
 		buttonPanel.add(curStrandNum);
 		
+		searchIndex = new JLabel("Found at: " + indexFound);
+		searchIndex.setFont(new Font("Times New Roman", Font.BOLD, 30));
+		searchIndex.setBounds(630, 300, 300, 50);
+		buttonPanel.add(searchIndex);
+		
+		//SEPARATORS
+		JSeparator divider;
+		
+		divider = new JSeparator(SwingConstants.HORIZONTAL);
+		divider.setBounds(20, 150, 900, 25);
+		buttonPanel.add(divider);
+		
+		divider = new JSeparator(SwingConstants.HORIZONTAL);
+		divider.setBounds(20, 280, 900, 25);
+		buttonPanel.add(divider);
+		
 		//TEXTFIELDS
 		idField = new JTextField(30);
 		idField.setFont(new Font("Times New Roman", Font.PLAIN, 30));
-		idField.setBounds(320, 25, 450, 50);
+		idField.setBounds(320, 25, 600, 50);
 		buttonPanel.add(idField);
 		
 		curField = new JFormattedTextField();
@@ -152,10 +195,26 @@ public class GraphicsInterface {
 		curField.setBounds(470, 80, 60, 40);
 		buttonPanel.add(curField);
 		
+		searchField = new JTextField(30);
+		searchField.setFont(new Font("Times New Roman", Font.PLAIN, 30));
+		searchField.setBounds(30, 350, 600, 50);
+		searchField.addKeyListener(new KeyAdapter() {
+			public void keyTyped(KeyEvent e) { //Limits input in text field to only ATCG
+				  char c = e.getKeyChar();
+				  if (c == 'A' || c == 'T' || c == 'C' || c == 'G' || c == 'a' || c == 't' || c == 'c' || c == 'g') {
+					  //allow keyboard input
+				  }
+				  else {
+					  e.consume();  // ignore event
+				  }
+			}
+		});
+		buttonPanel.add(searchField);
+		
 		//BUTTONS
 		displayButton = new JButton("Display");
 		displayButton.setFont(new Font("Times New Roman", Font.PLAIN, 30));
-		displayButton.setBounds(780, 25, 140, 50);
+		displayButton.setBounds(580, 80, 140, 50);
 		displayButton.addActionListener(new ActionListener()
 		{
 			  public void actionPerformed(ActionEvent e)
@@ -163,7 +222,7 @@ public class GraphicsInterface {
 			    System.out.println("Display");
 			    String tempText = curField.getText();
 			    int tempInt = Integer.parseInt(tempText);
-			    if (tempInt > 0 && tempInt < strandArr.length) {
+			    if (tempInt >= 0 && tempInt < strandArr.length) {
 			    	drawStrand(tempInt);
 			    }
 			  }
@@ -172,7 +231,7 @@ public class GraphicsInterface {
 		
 		minusButton = new JButton("-");
 		minusButton.setFont(new Font("Times New Roman", Font.PLAIN, 30));
-		minusButton.setBounds(870, 90, 50, 50);
+		minusButton.setBounds(870, 80, 50, 50);
 		minusButton.addActionListener(new ActionListener()
 		{
 			  public void actionPerformed(ActionEvent e)
@@ -187,7 +246,7 @@ public class GraphicsInterface {
 		
 		plusButton = new JButton("+");
 		plusButton.setFont(new Font("Times New Roman", Font.BOLD, 28));
-		plusButton.setBounds(810, 90, 50, 50);
+		plusButton.setBounds(810, 80, 50, 50);
 		plusButton.addActionListener(new ActionListener()
 		{
 			  public void actionPerformed(ActionEvent e)
@@ -202,7 +261,7 @@ public class GraphicsInterface {
 		
 		randButton = new JButton("?");
 		randButton.setFont(new Font("Times New Roman", Font.BOLD, 30));
-		randButton.setBounds(750, 90, 50, 50);
+		randButton.setBounds(750, 80, 50, 50);
 		randButton.addActionListener(new ActionListener()
 		{
 			  public void actionPerformed(ActionEvent e)
@@ -214,11 +273,37 @@ public class GraphicsInterface {
 			  }
 			});
 		buttonPanel.add(randButton);
+		
+		searchButton = new JButton("Search");
+		searchButton.setFont(new Font("Times New Roman", Font.BOLD, 30));
+		searchButton.setBounds(650, 350, 150, 50);
+		searchButton.addActionListener(new ActionListener()
+		{
+			  public void actionPerformed(ActionEvent e)
+			  {
+			    System.out.println("Searching for Strand");
+			    String strandSample = searchField.getText();
+			    strandSample = strandSample.toUpperCase();
+			    indexFound = strandArr[curStrand].patternSearch(strandSample);
+			    sideFound = " @ Main";
+			    if (indexFound == -1) {
+			    	System.out.println("Searching Comp String");
+			    	sideFound = " @ Comp";
+			    	indexFound = strandArr[curStrand].compStrand().patternSearch(strandSample);
+			    }
+			    if (indexFound == -1) {
+			    	sideFound = " @ NaN";
+			    }
+			    updateUI();
+			  }
+			});
+		buttonPanel.add(searchButton);
 	}
 	
 	public void updateUI() {
 		strandNum.setText("Total Strands: " + totalStrands);
 		curField.setText(Integer.toString(curStrand));
+		searchIndex.setText("Found at: " + indexFound + sideFound);
 	}
 	
 	public void addMouseEventHandler() {	//To test coordinates and dynamic drawing
@@ -231,8 +316,8 @@ public class GraphicsInterface {
 	}
 	
 	public void drawStrand(int i) { //Draws strand from the strand array inside this class
-		drawStrand(strandArr[i]);
 		curStrand = i;
+		drawStrand(strandArr[i]);
 	}
 	
 	public void drawStrand(DNAStrand strand) { //Draws entire strand, both sides
@@ -240,6 +325,7 @@ public class GraphicsInterface {
 		int baseY = 30;
 		DNAStrand temp = strand.compStrand();
 		idField.setText(strand.getID());
+		rawDataStr.setText(strand.getData());
 		for (int i = 0; i < strand.getLength(); ++i) {
 			Rectangle2D line = new Rectangle2D.Float(baseX + 120, baseY + 20 + 60 * i, 10, 5);
 			bufferedImageGraphics.fill(line);
